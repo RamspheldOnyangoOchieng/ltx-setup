@@ -13,7 +13,21 @@ for arg in "$@"; do
   fi
 done
 
-# ── 1. UPDATE COMFYUI ─────────────────────────────────────
+# ── 1. BOOTSTRAP + UPDATE COMFYUI ─────────────────────────
+echo "[1/5] Checking base dependencies..."
+if ! command -v curl &> /dev/null || ! command -v git &> /dev/null || ! command -v wget &> /dev/null; then
+  apt-get update -q
+  apt-get install -y -q curl git wget python3-pip
+fi
+
+mkdir -p /workspace
+cd /workspace
+
+if [ ! -d "/workspace/ComfyUI" ]; then
+  echo "  ComfyUI not found — cloning fresh install..."
+  git clone --depth=1 https://github.com/comfyanonymous/ComfyUI.git /workspace/ComfyUI
+fi
+
 echo "[1/5] Updating ComfyUI..."
 cd /workspace/ComfyUI
 git fetch --all -q
@@ -24,6 +38,7 @@ pip install -r requirements.txt --break-system-packages -q
 # ── 2. CUSTOM NODES ───────────────────────────────────────
 echo "[2/5] Installing custom nodes..."
 CN=/workspace/ComfyUI/custom_nodes
+mkdir -p $CN
 cd $CN
 
 cup() {
