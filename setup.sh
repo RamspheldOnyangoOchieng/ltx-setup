@@ -73,10 +73,24 @@ cup "comfyui-resolution-master"   "https://github.com/Azornes/Comfyui-Resolution
 cup "ComfyUI-ListHelper"          "https://github.com/dseditor/ComfyUI-ListHelper"
 
 # ── 3. PYTHON DEPS ────────────────────────────────────────
-echo "[3/5] Installing Python dependencies..."
+echo "[3/5] Gathering and installing Python dependencies..."
+REQ_FILE=$(mktemp)
 for req in $CN/*/requirements.txt; do
-  pip install -r "$req" --break-system-packages -q 2>/dev/null || true
+  if [ -f "$req" ]; then
+    echo "  + $(basename $(dirname $req)) requirements"
+    cat "$req" >> "$REQ_FILE"
+    echo "" >> "$REQ_FILE" # Ensure newline
+  fi
 done
+
+if [ -s "$REQ_FILE" ]; then
+  echo "  Running batch installation of all dependencies..."
+  pip install -r "$REQ_FILE" --break-system-packages
+else
+  echo "  No Python requirements found."
+fi
+rm -f "$REQ_FILE"
+
 
 # ── 4. MODELS ─────────────────────────────────────────────
 echo "[4/5] Downloading models..."
