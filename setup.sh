@@ -5,6 +5,14 @@ echo "=============================="
 echo " LTX 2.3 AUTO-PROVISIONER"
 echo "=============================="
 
+# ── 0. ARG PARSING ─────────────────────────────────────────
+LAUNCH=true
+for arg in "$@"; do
+  if [ "$arg" == "--no-launch" ]; then
+    LAUNCH=false
+  fi
+done
+
 # ── 1. UPDATE COMFYUI ─────────────────────────────────────
 echo "[1/5] Updating ComfyUI..."
 cd /workspace/ComfyUI
@@ -129,12 +137,16 @@ dl "$POSE/dw-ll_ucoco_384_bs5.torchscript.pt" \
    "https://huggingface.co/Kijai/DWPose-SAM/resolve/main/dw-ll_ucoco_384_bs5.torchscript.pt"
 
 # ── 5. LAUNCH ─────────────────────────────────────────────
-echo "[5/5] Launching ComfyUI..."
-cd /workspace/ComfyUI
-python main.py \
-  --listen 0.0.0.0 \
-  --port 8188 \
-  --highvram \
-  --gpu-only \
-  --fast \
-  --disable-smart-memory
+if [ "$LAUNCH" = true ]; then
+  echo "[5/5] Launching ComfyUI..."
+  cd /workspace/ComfyUI
+  python main.py \
+    --listen 0.0.0.0 \
+    --port 8188 \
+    --highvram \
+    --gpu-only \
+    --fast \
+    --disable-smart-memory
+else
+  echo "[5/5] Skipping launch (--no-launch passed). Setup complete."
+fi
