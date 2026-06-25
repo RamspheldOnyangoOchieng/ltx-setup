@@ -53,7 +53,6 @@ cup() {
 
 cup "comfyui_controlnet_aux"      "https://github.com/Fannovel16/comfyui_controlnet_aux"
 cup "ComfyUI-LTXVideo"            "https://github.com/Lightricks/ComfyUI-LTXVideo"
-cup "ComfyUI-LTXVideo-Director"   "https://github.com/Lightricks/ComfyUI-LTXVideo-Director"
 cup "ComfyUI-Impact-Pack"         "https://github.com/ltdrdata/ComfyUI-Impact-Pack"
 cup "rgthree-comfy"               "https://github.com/rgthree/rgthree-comfy"
 cup "ComfyUI-Custom-Scripts"      "https://github.com/pythongosssss/ComfyUI-Custom-Scripts"
@@ -63,14 +62,15 @@ cup "ComfyUI-Easy-Use"            "https://github.com/yolain/ComfyUI-Easy-Use"
 cup "ComfyUI-VideoHelperSuite"    "https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite"
 cup "ComfyUI-Frame-Interpolation" "https://github.com/Fannovel16/ComfyUI-Frame-Interpolation"
 cup "cg-use-everywhere"           "https://github.com/chrisgoringe/cg-use-everywhere"
-cup "Nvidia_RTX_Nodes_ComfyUI"    "https://github.com/Nvidia/Nvidia_RTX_Nodes_ComfyUI"
-cup "CRT-Nodes"                   "https://github.com/crystian/ComfyUI-Crystools"
-cup "WhatDreamsCost-ComfyUI"      "https://github.com/WhatDreamsCost/ComfyUI-WhatDreamsCost"
-cup "TTS-Audio-Suite"             "https://github.com/FoxaFoxus/TTS-Audio-Suite"
-cup "ComfyUI-PromptRelay"         "https://github.com/PolyMindAI/ComfyUI-PromptRelay"
+cup "Nvidia_RTX_Nodes_ComfyUI"    "https://github.com/Comfy-Org/Nvidia_RTX_Nodes_ComfyUI"
+cup "ComfyUI-Crystools"           "https://github.com/crystian/ComfyUI-Crystools"
+cup "CRT-Nodes"                   "https://github.com/PGCRT/CRT-Nodes"
+cup "WhatDreamsCost-ComfyUI"      "https://github.com/WhatDreamsCost/WhatDreamsCost-ComfyUI"
+cup "TTS-Audio-Suite"             "https://github.com/diodiogod/TTS-Audio-Suite"
+cup "ComfyUI-PromptRelay"         "https://github.com/kijai/ComfyUI-PromptRelay"
 cup "ComfyUI-MelBandRoFormer"     "https://github.com/kijai/ComfyUI-MelBandRoFormer"
-cup "comfyui-resolution-master"   "https://github.com/bmad4ever/comfyui-resolution-master"
-cup "ComfyUI-FancyTimerNode"      "https://github.com/Fannovel16/ComfyUI-FancyTimerNode"
+cup "comfyui-resolution-master"   "https://github.com/Azornes/Comfyui-Resolution-Master"
+cup "ComfyUI-ListHelper"          "https://github.com/dseditor/ComfyUI-ListHelper"
 
 # ── 3. PYTHON DEPS ────────────────────────────────────────
 echo "[3/5] Installing Python dependencies..."
@@ -145,11 +145,28 @@ dl "$DM/MelBandRoformer_fp16.safetensors" \
 
 # RIFE frame interpolation
 dl "$RIFE/rife49.pth" \
-   "https://huggingface.co/AlexWortega/RIFE/resolve/main/rife49.pth"
+   "https://huggingface.co/Isi99999/Frame_Interpolation_Models/resolve/main/rife49.pth"
 
 # DW-Pose for ControlNet DWPreprocessor
 dl "$POSE/dw-ll_ucoco_384_bs5.torchscript.pt" \
-   "https://huggingface.co/Kijai/DWPose-SAM/resolve/main/dw-ll_ucoco_384_bs5.torchscript.pt"
+   "https://huggingface.co/hr16/DWPose-TorchScript-BatchSize5/resolve/main/dw-ll_ucoco_384_bs5.torchscript.pt"
+
+dl "$POSE/yolox_l.onnx" \
+   "https://huggingface.co/yzd-v/DWPose/resolve/main/yolox_l.onnx"
+
+# Create symlinks to ensure various custom nodes find the models where they expect them
+echo "Creating model compatibility symlinks..."
+mkdir -p /workspace/ComfyUI/custom_nodes/comfyui_controlnet_aux/ckpts/hr16/DWPose-TorchScript-BatchSize5
+ln -sf /workspace/ComfyUI/models/dw-pose/dw-ll_ucoco_384_bs5.torchscript.pt \
+       /workspace/ComfyUI/custom_nodes/comfyui_controlnet_aux/ckpts/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt
+
+mkdir -p /workspace/ComfyUI/custom_nodes/comfyui_controlnet_aux/ckpts/yzd-v/DWPose
+ln -sf /workspace/ComfyUI/models/dw-pose/yolox_l.onnx \
+       /workspace/ComfyUI/custom_nodes/comfyui_controlnet_aux/ckpts/yzd-v/DWPose/yolox_l.onnx
+
+mkdir -p /workspace/ComfyUI/custom_nodes/ComfyUI-Frame-Interpolation/ckpts/rife
+ln -sf /workspace/ComfyUI/models/rife/rife49.pth \
+       /workspace/ComfyUI/custom_nodes/ComfyUI-Frame-Interpolation/ckpts/rife/rife49.pth
 
 # ── 5. LAUNCH ─────────────────────────────────────────────
 if [ "$LAUNCH" = true ]; then
